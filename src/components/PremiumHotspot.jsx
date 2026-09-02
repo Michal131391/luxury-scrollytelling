@@ -11,27 +11,12 @@ export default function PremiumHotspot({
   direction = 'right',
   className = ''
 }) {
-  let lineClasses = "";
-  let cardClasses = "";
-
-  switch (direction) {
-    case 'right':
-      lineClasses = "left-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-left";
-      cardClasses = "left-[calc(0.75rem+4rem)] md:left-[calc(0.75rem+6rem)] top-0 -translate-y-1/2";
-      break;
-    case 'left':
-      lineClasses = "right-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-right";
-      cardClasses = "right-[calc(0.75rem+4rem)] md:right-[calc(0.75rem+6rem)] top-0 -translate-y-1/2";
-      break;
-    case 'top':
-      lineClasses = "bottom-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-bottom";
-      cardClasses = "bottom-[calc(0.75rem+4rem)] md:bottom-[calc(0.75rem+6rem)] left-0 -translate-x-1/2";
-      break;
-    case 'bottom':
-      lineClasses = "top-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-top";
-      cardClasses = "top-[calc(0.75rem+4rem)] md:top-[calc(0.75rem+6rem)] left-0 -translate-x-1/2";
-      break;
-  }
+  const positions = {
+    top: { card: 'bottom-full left-1/2 -translate-x-1/2 mb-4', lineClasses: 'bottom-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-bottom', lineScale: 'scaleY(0)' },
+    bottom: { card: 'top-full left-1/2 -translate-x-1/2 mt-4', lineClasses: 'top-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-top', lineScale: 'scaleY(0)' },
+    left: { card: 'md:right-full top-full md:top-1/2 md:-translate-y-1/2 left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0 md:mr-4', lineClasses: 'right-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-right', lineScale: 'scaleX(0)' },
+    right: { card: 'md:left-full top-full md:top-1/2 md:-translate-y-1/2 left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0 md:ml-4', lineClasses: 'left-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-left', lineScale: 'scaleX(0)' }
+  };
 
   return (
     <div 
@@ -45,27 +30,23 @@ export default function PremiumHotspot({
       <div className="dot absolute w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,1)]" style={{ opacity: 0 }} />
 
       {/* 3. Connecting Line */}
-      <div className={`line absolute bg-white/60 ${lineClasses}`} style={{ transform: direction === 'left' || direction === 'right' ? 'scaleX(0)' : 'scaleY(0)' }} />
+      <div className={`line absolute bg-white/60 ${positions[direction].lineClasses}`} style={{ transform: positions[direction].lineScale }} />
 
       {/* 4. Glassmorphic Card */}
       <div 
-        className={`card absolute w-56 md:w-72 bg-black/40 backdrop-blur-2xl border border-white/10 p-5 shadow-2xl overflow-hidden ${cardClasses}`}
-        style={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
+        className={`card absolute w-[280px] md:w-80 backdrop-blur-xl bg-black/40 border border-white/20 p-4 md:p-5 ${positions[direction].card}`} 
+        style={{ opacity: 0 }}
       >
         <div className="relative z-10">
-            <h4 className="font-sans text-[9px] md:text-[10px] tracking-[0.4em] uppercase text-white/50 mb-1.5">{subtitle}</h4>
-            <h3 className="font-sans text-lg md:text-xl font-light text-white drop-shadow-md mb-4">{title}</h3>
+            <h4 className="font-sans text-[8px] md:text-[10px] tracking-[0.4em] uppercase text-white/50 mb-1.5">{subtitle}</h4>
+            <h3 className="font-sans text-base md:text-xl font-light text-white drop-shadow-md mb-3 md:mb-4">{title}</h3>
             
-            <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-4" />
+            <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-3 md:mb-4" />
             
-            <div className="flex flex-col gap-2.5">
-                <div className="flex justify-between items-center text-[10px] md:text-xs font-sans">
-                    <span className="text-white/40 tracking-widest uppercase">Feature</span>
-                    <span className="text-white/90 tracking-widest uppercase text-right">{spec1}</span>
-                </div>
-                <div className="flex justify-between items-center text-[10px] md:text-xs font-sans">
-                    <span className="text-white/40 tracking-widest uppercase">Material</span>
-                    <span className="text-white/90 tracking-widest uppercase text-right">{spec2}</span>
+            <div className="flex gap-4 md:gap-6">
+                <div>
+                    <p className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-white/40 mb-1">{spec1}</p>
+                    <p className="font-sans text-xs md:text-sm font-medium text-white">{spec2}</p>
                 </div>
             </div>
         </div>

@@ -33,7 +33,7 @@ const DossierOverlay = forwardRef(({ onClose }, ref) => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 md:px-8 py-8 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-6 md:px-8 py-8 custom-scrollbar overscroll-contain">
         
         {/* Section A: Metrics Bento Box (Translated) */}
         <div className="grid grid-cols-2 gap-4 mb-10">

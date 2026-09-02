@@ -140,9 +140,12 @@ export default function App() {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        // Limit DPR on mobile to prevent GPU overload (Retina mobile screens are huge)
+        const isMobile = window.innerWidth < 768;
+        const effectiveDpr = isMobile ? Math.min(dpr, 1.5) : dpr;
         
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
+        canvas.width = window.innerWidth * effectiveDpr;
+        canvas.height = window.innerHeight * effectiveDpr;
         
         const img = framesRef.current[i]?.[0];
         if (img) drawFrame(ctx, canvas, img);
@@ -163,7 +166,7 @@ export default function App() {
       if (canvas) {
         gsap.set(canvas, { 
           zIndex: totalVideos - i, 
-          opacity: 1 
+          autoAlpha: 1 
         }); 
       }
     });
@@ -277,7 +280,7 @@ export default function App() {
         const transitionDuration = (0.6 / totalScrollDuration);
         
         tl.to(canvas, { 
-          opacity: 0, duration: transitionDuration, ease: "power2.inOut" 
+          autoAlpha: 0, duration: transitionDuration, ease: "power2.inOut" 
         }, transitionStart);
       }
 
