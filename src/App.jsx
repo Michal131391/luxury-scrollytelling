@@ -106,6 +106,9 @@ export default function App() {
   const scrollTrackRef = useRef(null);
   const mainWrapperRef = useRef(null);
   const dossierRef = useRef(null);
+  const progressBarRef = useRef(null);
+  const cinematicFooterRef = useRef(null);
+  const lenisRef = useRef(null);
   const canvasRefs = useRef([]);
   const textRefs = useRef([]);
   
@@ -120,6 +123,7 @@ export default function App() {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -173,6 +177,36 @@ export default function App() {
         pin: false, // NO PINNING - CSS sticky handles this smoothly
       }
     });
+
+    if (progressBarRef.current) {
+       gsap.to(progressBarRef.current, {
+         width: '100%',
+         ease: 'none',
+         scrollTrigger: {
+           trigger: scrollTrackRef.current,
+           start: "top top",
+           end: "bottom bottom",
+           scrub: 0
+         }
+       });
+    }
+
+    if (cinematicFooterRef.current) {
+       const startRatio = segmentStarts[7] / totalScrollDuration;
+       gsap.fromTo(cinematicFooterRef.current, 
+         { autoAlpha: 0 },
+         { 
+           autoAlpha: 1, 
+           ease: "none",
+           scrollTrigger: {
+             trigger: scrollTrackRef.current,
+             start: `${startRatio * 100}% top`,
+             end: `${(startRatio * 100) + 10}% top`, 
+             scrub: true
+           }
+         }
+       );
+    }
 
     framesRef.current.forEach((frames, i) => {
       const canvas = canvasRefs.current[i];
@@ -418,6 +452,8 @@ export default function App() {
         </p>
       </div>
 
+      <div ref={progressBarRef} className="fixed top-0 left-0 h-[2px] bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] z-[200]" style={{ width: '0%' }} />
+
       {/* Massive Scroll Track mapped to duration */}
       <div ref={scrollTrackRef} style={{ height: `${totalScrollDuration * 100}vh` }} className="relative w-full bg-black">
         
@@ -484,6 +520,23 @@ export default function App() {
         </div>
       </div>
       
+      {/* Cinematic Footer for Sequence 08 */}
+      <div ref={cinematicFooterRef} className="fixed bottom-0 left-0 w-full z-[80] pointer-events-none opacity-0 flex justify-between items-end p-8 pb-10">
+          <div className="absolute bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-black/80 to-transparent -z-10 pointer-events-none" />
+          <div className="text-white pointer-events-auto">
+            <p className="font-sans text-xs font-light tracking-[0.3em] uppercase mb-2 text-white/50 drop-shadow-md">Exclusive Agent</p>
+            <p className="font-sans text-2xl font-light tracking-tight drop-shadow-lg">Sarah Jenkins</p>
+          </div>
+          <div>
+            <button 
+               onClick={() => lenisRef.current?.scrollTo(0, { duration: 2, ease: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) })}
+               className="text-[rgba(255,255,255,0.4)] text-[11px] md:text-xs font-light transition-all duration-300 hover:text-white hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] pointer-events-auto"
+            >
+              Experience driven by <span className="uppercase font-medium tracking-[0.25em] ml-1">FOVIA</span>
+            </button>
+          </div>
+      </div>
+      
       {/* Dossier Component */}
       <DossierOverlay ref={dossierRef} onClose={() => setIsDossierOpen(false)} />
 
@@ -496,7 +549,7 @@ export default function App() {
             className="group relative px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-sans text-sm tracking-widest uppercase hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl overflow-hidden"
         >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-            Explore Dossier
+            Szczegóły i Dane Oferty
         </button>
       </div>
       
