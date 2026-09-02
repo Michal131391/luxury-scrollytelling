@@ -12,10 +12,26 @@ export default function PremiumHotspot({
   className = ''
 }) {
   const positions = {
-    top: { card: 'bottom-full left-1/2 -translate-x-1/2 mb-4', lineClasses: 'bottom-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-bottom', lineScale: 'scaleY(0)' },
-    bottom: { card: 'top-full left-1/2 -translate-x-1/2 mt-4', lineClasses: 'top-3 left-0 h-16 md:h-24 w-[1px] -translate-x-1/2 origin-top', lineScale: 'scaleY(0)' },
-    left: { card: 'md:right-full top-full md:top-1/2 md:-translate-y-1/2 left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0 md:mr-4', lineClasses: 'right-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-right', lineScale: 'scaleX(0)' },
-    right: { card: 'md:left-full top-full md:top-1/2 md:-translate-y-1/2 left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0 md:ml-4', lineClasses: 'left-3 top-0 w-16 md:w-24 h-[1px] -translate-y-1/2 origin-left', lineScale: 'scaleX(0)' }
+    top: { 
+      card: 'bottom-full left-1/2 -translate-x-1/2 mb-2 md:mb-4', 
+      lineClasses: 'bottom-2 md:bottom-3 left-0 h-8 md:h-24 w-[1px] -translate-x-1/2 origin-bottom', 
+      lineScale: 'scaleY(0)' 
+    },
+    bottom: { 
+      card: 'top-full left-1/2 -translate-x-1/2 mt-2 md:mt-4', 
+      lineClasses: 'top-2 md:top-3 left-0 h-8 md:h-24 w-[1px] -translate-x-1/2 origin-top', 
+      lineScale: 'scaleY(0)' 
+    },
+    left: { 
+      card: 'right-full top-1/2 -translate-y-1/2 mr-2 md:mr-4', 
+      lineClasses: 'right-2 md:right-3 top-0 w-8 md:w-24 h-[1px] -translate-y-1/2 origin-right', 
+      lineScale: 'scaleX(0)' 
+    },
+    right: { 
+      card: 'left-full top-1/2 -translate-y-1/2 ml-2 md:ml-4', 
+      lineClasses: 'left-2 md:left-3 top-0 w-8 md:w-24 h-[1px] -translate-y-1/2 origin-left', 
+      lineScale: 'scaleX(0)' 
+    }
   };
 
   return (
@@ -34,19 +50,19 @@ export default function PremiumHotspot({
 
       {/* 4. Glassmorphic Card */}
       <div 
-        className={`card absolute w-[280px] md:w-80 backdrop-blur-xl bg-black/40 border border-white/20 p-4 md:p-5 ${positions[direction].card}`} 
+        className={`card absolute w-[160px] md:w-80 backdrop-blur-xl bg-black/40 border border-white/20 p-3 md:p-5 ${positions[direction].card}`} 
         style={{ opacity: 0 }}
       >
         <div className="relative z-10">
-            <h4 className="font-sans text-[8px] md:text-[10px] tracking-[0.4em] uppercase text-white/50 mb-1.5">{subtitle}</h4>
-            <h3 className="font-sans text-base md:text-xl font-light text-white drop-shadow-md mb-3 md:mb-4">{title}</h3>
+            <h4 className="font-sans text-[7px] md:text-[10px] tracking-[0.3em] md:tracking-[0.4em] uppercase text-white/50 mb-1">{subtitle}</h4>
+            <h3 className="font-sans text-xs md:text-xl font-light text-white drop-shadow-md leading-tight mb-2 md:mb-4">{title}</h3>
             
-            <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-3 md:mb-4" />
+            <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-2 md:mb-4" />
             
-            <div className="flex gap-4 md:gap-6">
+            <div className="flex flex-col md:flex-row gap-1 md:gap-6">
                 <div>
-                    <p className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-white/40 mb-1">{spec1}</p>
-                    <p className="font-sans text-xs md:text-sm font-medium text-white">{spec2}</p>
+                    <p className="font-sans text-[7px] md:text-[9px] uppercase tracking-widest text-white/40 mb-0.5 md:mb-1">{spec1}</p>
+                    <p className="font-sans text-[10px] md:text-sm font-medium text-white">{spec2}</p>
                 </div>
             </div>
         </div>

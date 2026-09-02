@@ -556,7 +556,7 @@ export default function App() {
             className="group relative px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-sans text-sm tracking-widest uppercase hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl overflow-hidden"
         >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-            Szczegóły i Dane Oferty
+            Szczegóły Oferty
         </button>
       </div>
       
