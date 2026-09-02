@@ -50,19 +50,19 @@ export default function PremiumHotspot({
 
       {/* 4. Glassmorphic Card */}
       <div 
-        className={`card absolute w-[160px] md:w-80 backdrop-blur-xl bg-black/40 border border-white/20 p-3 md:p-5 ${positions[direction].card}`} 
+        className={`card absolute w-[170px] md:w-80 backdrop-blur-2xl bg-black/70 border border-white/20 p-3 md:p-5 shadow-2xl ${positions[direction].card}`} 
         style={{ opacity: 0 }}
       >
         <div className="relative z-10">
-            <h4 className="font-sans text-[7px] md:text-[10px] tracking-[0.3em] md:tracking-[0.4em] uppercase text-white/50 mb-1">{subtitle}</h4>
-            <h3 className="font-sans text-xs md:text-xl font-light text-white drop-shadow-md leading-tight mb-2 md:mb-4">{title}</h3>
+            <h4 className="font-sans text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase text-white/70 mb-1">{subtitle}</h4>
+            <h3 className="font-sans text-sm md:text-xl font-medium text-white drop-shadow-lg leading-tight mb-2 md:mb-4">{title}</h3>
             
-            <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-2 md:mb-4" />
+            <div className="h-[1px] w-full bg-gradient-to-r from-white/40 to-transparent mb-2 md:mb-4" />
             
             <div className="flex flex-col md:flex-row gap-1 md:gap-6">
                 <div>
-                    <p className="font-sans text-[7px] md:text-[9px] uppercase tracking-widest text-white/40 mb-0.5 md:mb-1">{spec1}</p>
-                    <p className="font-sans text-[10px] md:text-sm font-medium text-white">{spec2}</p>
+                    <p className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-white/60 mb-0.5 md:mb-1">{spec1}</p>
+                    <p className="font-sans text-[11px] md:text-sm font-semibold text-white drop-shadow-sm">{spec2}</p>
                 </div>
             </div>
         </div>
