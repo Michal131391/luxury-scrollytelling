@@ -321,7 +321,7 @@ export default function App() {
     };
   }, { scope: scrollTrackRef, dependencies: [isLoaded] });
 
-  // Handle Dossier Animation
+  // Handle Dossier Animation and Scroll Lock
   useEffect(() => {
     if (!mainWrapperRef.current || !dossierRef.current) return;
     if (isDossierOpen) {
@@ -332,10 +332,12 @@ export default function App() {
         ease: "apple"
       });
       gsap.to(dossierRef.current, {
+        x: "0%",
         y: "0%",
         duration: 0.8,
         ease: "apple"
       });
+      lenisRef.current?.stop();
     } else {
       gsap.to(mainWrapperRef.current, {
         scale: 1,
@@ -344,10 +346,12 @@ export default function App() {
         ease: "apple"
       });
       gsap.to(dossierRef.current, {
-        y: "100%",
+        x: "100%",
+        y: "0%",
         duration: 0.8,
         ease: "apple"
       });
+      lenisRef.current?.start();
     }
   }, [isDossierOpen]);
 
