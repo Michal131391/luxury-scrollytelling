@@ -195,17 +195,43 @@ export default function App() {
         );
       }
 
-      // 3. Text Overlays (Elegant entry/exit)
+      // 3. Text Overlays (Staggered to bridge transitions and mask friction)
       if (text) {
-        tl.fromTo(text, 
-          { autoAlpha: 0, y: 50, filter: "blur(10px)" },
-          { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" },
-          segmentStart + 0.3
-        );
-        tl.to(text,
-          { autoAlpha: 0, y: -50, filter: "blur(10px)", duration: 0.5, ease: "power2.in" },
-          segmentStart + 1.4
-        );
+        if (i === 0) {
+          // Intro: fade in fast, fade out just before transition
+          tl.fromTo(text, 
+            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
+            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out" },
+            segmentStart + 0.2
+          );
+          tl.to(text,
+            { autoAlpha: 0, y: -40, filter: "blur(15px)", duration: 0.5, ease: "power2.in" },
+            segmentStart + 0.8 // Gone by 1.3
+          );
+        } else if (i === totalVideos - 1) {
+          // Final Contact Form: fades in on the last scene
+          tl.fromTo(text, 
+            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
+            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" },
+            segmentStart + 0.6
+          );
+        } else {
+          // Bridging texts (1 to 6)
+          const prevSegmentStart = (i - 1) * 2;
+          
+          // Enter: exactly as the previous background begins its blurred scale-up
+          tl.fromTo(text, 
+            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
+            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out" },
+            prevSegmentStart + 1.3 
+          );
+          
+          // Exit: mid-way through the current scene, leaving breathing room before next transition
+          tl.to(text,
+            { autoAlpha: 0, y: -40, filter: "blur(15px)", duration: 0.6, ease: "power2.in" },
+            segmentStart + 0.6 // Gone by (segmentStart + 1.2)
+          );
+        }
       }
     });
 
