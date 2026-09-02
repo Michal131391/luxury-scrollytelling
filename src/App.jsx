@@ -1,11 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CustomEase } from 'gsap/CustomEase';
 import { useGSAP } from '@gsap/react';
 import Lenis from 'lenis';
 import PremiumHotspot from './components/PremiumHotspot';
+import DossierOverlay from './components/DossierOverlay';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, CustomEase);
+CustomEase.create("apple", "0.32, 0.72, 0, 1");
 
 const frameCounts = [96, 96, 96, 96, 96, 96, 96, 96];
 const totalVideos = frameCounts.length;
@@ -101,9 +104,13 @@ function drawFrame(ctx, canvas, img) {
 
 export default function App() {
   const containerRef = useRef(null);
+  const mainWrapperRef = useRef(null);
+  const dossierRef = useRef(null);
   const canvasRefs = useRef([]);
   const textRefs = useRef([]);
   
+  const [isDossierOpen, setIsDossierOpen] = useState(false);
+
   const { loadedFrames, totalFrames, framesRef } = useFrameLoader();
   const isLoaded = loadedFrames === totalFrames && totalFrames > 0;
 
@@ -287,6 +294,36 @@ export default function App() {
     };
   }, { scope: containerRef, dependencies: [isLoaded] });
 
+  // Handle Dossier Animation
+  useEffect(() => {
+    if (!mainWrapperRef.current || !dossierRef.current) return;
+    if (isDossierOpen) {
+      gsap.to(mainWrapperRef.current, {
+        scale: 0.95,
+        filter: "blur(20px)",
+        duration: 0.8,
+        ease: "apple"
+      });
+      gsap.to(dossierRef.current, {
+        y: "0%",
+        duration: 0.8,
+        ease: "apple"
+      });
+    } else {
+      gsap.to(mainWrapperRef.current, {
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 0.8,
+        ease: "apple"
+      });
+      gsap.to(dossierRef.current, {
+        y: "100%",
+        duration: 0.8,
+        ease: "apple"
+      });
+    }
+  }, [isDossierOpen]);
+
   const textOverlays = [
     (
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
@@ -368,7 +405,7 @@ export default function App() {
   ];
 
   return (
-    <div className="bg-[#111] w-full min-h-screen font-sans selection:bg-white/20">
+    <div className="bg-black w-full min-h-screen font-sans selection:bg-white/20 overflow-hidden">
       
       {/* Cinematic Preloader */}
       <div 
@@ -388,66 +425,84 @@ export default function App() {
         </p>
       </div>
 
-      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#111]">
-        
-        {frameCounts.map((_, i) => (
-          <canvas
-            key={`canvas-${i}`}
-            ref={el => canvasRefs.current[i] = el}
-            className="absolute inset-0 w-full h-full block origin-center will-change-transform"
-          />
-        ))}
+      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+        {/* Main Wrapper for Scaling and Blurring when Dossier opens */}
+        <div ref={mainWrapperRef} className="absolute inset-0 origin-bottom will-change-transform">
+            {frameCounts.map((_, i) => (
+            <canvas
+                key={`canvas-${i}`}
+                ref={el => canvasRefs.current[i] = el}
+                className="absolute inset-0 w-full h-full block origin-center will-change-transform"
+            />
+            ))}
 
-        {/* Global Dimmers for Depth of Field effect */}
-        {segmentsConfig.map((seg, i) => seg.hotspotDuration > 0 && (
-          <div key={`dimmer-${i}`} className={`dimmer-vid-${i} absolute inset-0 bg-black/50 backdrop-blur-md z-[50] pointer-events-none`} style={{ opacity: 0, visibility: 'hidden' }} />
-        ))}
+            {/* Global Dimmers for Depth of Field effect */}
+            {segmentsConfig.map((seg, i) => seg.hotspotDuration > 0 && (
+            <div key={`dimmer-${i}`} className={`dimmer-vid-${i} absolute inset-0 bg-black/20 z-[50] pointer-events-none`} style={{ opacity: 0, visibility: 'hidden' }} />
+            ))}
 
-        {/* --- HOTSPOTS --- */}
-        <div className="absolute inset-0 z-[55] pointer-events-none">
-          
-          {/* Video 1: Pool & Spa */}
-          <PremiumHotspot id="1-1" className="hotspot-vid-1" title="Infinity Edge" subtitle="Architectural Water Feature" spec1="Design" spec2="Seamless Horizon" top="65%" left="45%" direction="right" />
-          <PremiumHotspot id="1-2" className="hotspot-vid-1" title="Cascading Spa" subtitle="Custom Built" spec1="Capacity" spec2="12-Person" top="75%" left="75%" direction="top" />
+            {/* --- HOTSPOTS --- */}
+            <div className="absolute inset-0 z-[55] pointer-events-none">
+            
+            {/* Video 1: Pool & Spa */}
+            <PremiumHotspot id="1-1" className="hotspot-vid-1" title="Infinity Edge" subtitle="Architectural Water Feature" spec1="Design" spec2="Seamless Horizon" top="65%" left="45%" direction="right" />
+            <PremiumHotspot id="1-2" className="hotspot-vid-1" title="Cascading Spa" subtitle="Custom Built" spec1="Capacity" spec2="12-Person" top="75%" left="75%" direction="top" />
 
-          {/* Video 2: Entrance */}
-          <PremiumHotspot id="2-1" className="hotspot-vid-2" title="Crystal Chandelier" subtitle="Foyer Lighting" spec1="Origin" spec2="Imported Italian" top="20%" left="50%" direction="right" />
-          <PremiumHotspot id="2-2" className="hotspot-vid-2" title="Vaulted Ceilings" subtitle="Grand Scale" spec1="Height" spec2="24 Feet" top="15%" left="25%" direction="bottom" />
+            {/* Video 2: Entrance */}
+            <PremiumHotspot id="2-1" className="hotspot-vid-2" title="Crystal Chandelier" subtitle="Foyer Lighting" spec1="Origin" spec2="Imported Italian" top="20%" left="50%" direction="right" />
+            <PremiumHotspot id="2-2" className="hotspot-vid-2" title="Vaulted Ceilings" subtitle="Grand Scale" spec1="Height" spec2="24 Feet" top="15%" left="25%" direction="bottom" />
 
-          {/* Video 3: Living Room */}
-          <PremiumHotspot id="3-1" className="hotspot-vid-3" title="Artisan Fireplace" subtitle="Custom Stonework" spec1="Material" spec2="Italian Travertine" top="55%" left="15%" direction="right" />
-          <PremiumHotspot id="3-2" className="hotspot-vid-3" title="Hardwood Flooring" subtitle="Wide Plank" spec1="Wood Type" spec2="European Oak" top="75%" left="55%" direction="left" />
+            {/* Video 3: Living Room */}
+            <PremiumHotspot id="3-1" className="hotspot-vid-3" title="Artisan Fireplace" subtitle="Custom Stonework" spec1="Material" spec2="Italian Travertine" top="55%" left="15%" direction="right" />
+            <PremiumHotspot id="3-2" className="hotspot-vid-3" title="Hardwood Flooring" subtitle="Wide Plank" spec1="Wood Type" spec2="European Oak" top="75%" left="55%" direction="left" />
 
-          {/* Video 4: Kitchen */}
-          <PremiumHotspot id="4-1" className="hotspot-vid-4" title="Calacatta Gold" subtitle="Chef's Island" spec1="Finish" spec2="Honed Marble" top="65%" left="45%" direction="left" />
-          <PremiumHotspot id="4-2" className="hotspot-vid-4" title="Sub-Zero & Wolf" subtitle="Integrated Appliances" spec1="Series" spec2="Professional Grade" top="35%" left="70%" direction="bottom" />
+            {/* Video 4: Kitchen */}
+            <PremiumHotspot id="4-1" className="hotspot-vid-4" title="Calacatta Gold" subtitle="Chef's Island" spec1="Finish" spec2="Honed Marble" top="65%" left="45%" direction="left" />
+            <PremiumHotspot id="4-2" className="hotspot-vid-4" title="Sub-Zero & Wolf" subtitle="Integrated Appliances" spec1="Series" spec2="Professional Grade" top="35%" left="70%" direction="bottom" />
 
-          {/* Video 5: Entertainment */}
-          <PremiumHotspot id="5-1" className="hotspot-vid-5" title="Acoustic Paneling" subtitle="Theater Grade" spec1="Rating" spec2="Studio Quality" top="40%" left="20%" direction="right" />
-          <PremiumHotspot id="5-2" className="hotspot-vid-5" title="Bespoke Wet Bar" subtitle="Entertainment Lounge" spec1="Counter" spec2="Backlit Onyx" top="60%" left="80%" direction="left" />
+            {/* Video 5: Entertainment */}
+            <PremiumHotspot id="5-1" className="hotspot-vid-5" title="Acoustic Paneling" subtitle="Theater Grade" spec1="Rating" spec2="Studio Quality" top="40%" left="20%" direction="right" />
+            <PremiumHotspot id="5-2" className="hotspot-vid-5" title="Bespoke Wet Bar" subtitle="Entertainment Lounge" spec1="Counter" spec2="Backlit Onyx" top="60%" left="80%" direction="left" />
 
-          {/* Video 6: Master Suite */}
-          <PremiumHotspot id="6-1" className="hotspot-vid-6" title="Panoramic Windows" subtitle="Valley Views" spec1="Glass" spec2="Floor-to-Ceiling" top="30%" left="30%" direction="right" />
-          <PremiumHotspot id="6-2" className="hotspot-vid-6" title="Spa Soaking Tub" subtitle="Primary Bath" spec1="Placement" spec2="Freestanding" top="65%" left="70%" direction="top" />
+            {/* Video 6: Master Suite */}
+            <PremiumHotspot id="6-1" className="hotspot-vid-6" title="Panoramic Windows" subtitle="Valley Views" spec1="Glass" spec2="Floor-to-Ceiling" top="30%" left="30%" direction="right" />
+            <PremiumHotspot id="6-2" className="hotspot-vid-6" title="Spa Soaking Tub" subtitle="Primary Bath" spec1="Placement" spec2="Freestanding" top="65%" left="70%" direction="top" />
 
+            </div>
+
+            {/* Elegant Gradient for Typography */}
+            <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-40 pointer-events-none mix-blend-multiply" />
+
+            {/* Text Containers */}
+            {textOverlays.map((content, i) => (
+            <div
+                key={i}
+                ref={el => textRefs.current[i] = el}
+                className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end will-change-transform"
+                style={{ opacity: 0, visibility: 'hidden' }}
+            >
+                {content}
+            </div>
+            ))}
         </div>
-
-        {/* Elegant Gradient for Typography */}
-        <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-40 pointer-events-none mix-blend-multiply" />
-
-        {/* Text Containers */}
-        {textOverlays.map((content, i) => (
-          <div
-            key={i}
-            ref={el => textRefs.current[i] = el}
-            className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end will-change-transform"
-            style={{ opacity: 0, visibility: 'hidden' }}
-          >
-            {content}
-          </div>
-        ))}
-        
       </div>
+      
+      {/* Dossier Component */}
+      <DossierOverlay ref={dossierRef} onClose={() => setIsDossierOpen(false)} />
+
+      {/* Floating Action Button */}
+      <div 
+        className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] transition-opacity duration-500 ${isDossierOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        <button 
+            onClick={() => setIsDossierOpen(true)}
+            className="group relative px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-sans text-sm tracking-widest uppercase hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl overflow-hidden"
+        >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+            Explore Dossier
+        </button>
+      </div>
+      
     </div>
   );
 }
