@@ -54,7 +54,7 @@ export default function PremiumHotspot({
       >
         <div className="relative z-10">
             <h4 className="font-sans text-[9px] md:text-[10px] tracking-[0.4em] uppercase text-white/50 mb-1.5">{subtitle}</h4>
-            <h3 className="font-serif text-lg md:text-xl font-light text-white drop-shadow-md mb-4">{title}</h3>
+            <h3 className="font-sans text-lg md:text-xl font-light text-white drop-shadow-md mb-4">{title}</h3>
             
             <div className="h-[1px] w-full bg-gradient-to-r from-white/30 to-transparent mb-4" />
             

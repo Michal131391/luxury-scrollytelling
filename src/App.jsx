@@ -321,7 +321,7 @@ export default function App() {
     (
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
         <div className="section-inner">
-            <h1 className="font-serif text-5xl md:text-8xl font-light tracking-wide text-white drop-shadow-2xl mb-4">22510 La Quilla Dr</h1>
+            <h1 className="font-sans text-5xl md:text-8xl font-light tracking-wide text-white drop-shadow-2xl mb-4">22510 La Quilla Dr</h1>
             <p className="font-sans text-sm md:text-2xl font-light tracking-[0.3em] uppercase text-zinc-200 drop-shadow-lg mb-6">Chatsworth, California</p>
             <p className="font-sans text-2xl md:text-4xl font-light tracking-[0.1em] text-white drop-shadow-lg">$4,795,000</p>
         </div>
@@ -331,7 +331,7 @@ export default function App() {
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
         <div className="section-inner">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">The Grounds</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Pool & Spa</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Pool & Spa</p>
         </div>
       </div>
     ),
@@ -339,7 +339,7 @@ export default function App() {
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
          <div className="section-inner">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">Grand Entrance</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Soaring Ceilings</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Soaring Ceilings</p>
          </div>
       </div>
     ),
@@ -347,7 +347,7 @@ export default function App() {
       <div className="absolute bottom-16 right-8 md:right-24 z-[60] align-right text-right">
         <div className="section-inner ml-auto">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">Living Area</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Expansive & Bright</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Expansive & Bright</p>
         </div>
       </div>
     ),
@@ -355,7 +355,7 @@ export default function App() {
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
         <div className="section-inner">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">Chef's Kitchen</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl">State-of-the-Art</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl">State-of-the-Art</p>
         </div>
       </div>
     ),
@@ -363,7 +363,7 @@ export default function App() {
       <div className="absolute bottom-16 right-8 md:right-24 z-[60] align-right text-right">
         <div className="section-inner ml-auto">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">Entertainment</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Private Lounge</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl">Private Lounge</p>
         </div>
       </div>
     ),
@@ -371,7 +371,7 @@ export default function App() {
       <div className="absolute bottom-16 left-8 md:left-24 z-[60] align-left">
         <div className="section-inner">
             <p className="font-sans text-xs md:text-sm tracking-[0.4em] uppercase text-zinc-300 drop-shadow-lg mb-4">Master Suite & Baths</p>
-            <p className="font-serif text-4xl md:text-7xl font-light text-white drop-shadow-2xl mb-8">Refined Luxury</p>
+            <p className="font-sans text-4xl md:text-7xl font-light text-white drop-shadow-2xl mb-8">Refined Luxury</p>
             <div className="flex flex-col gap-4 text-xl md:text-3xl font-sans font-light tracking-[0.2em] text-white/80 drop-shadow-xl">
                 <span>5 Beds</span>
                 <span>6 Baths</span>
@@ -383,7 +383,7 @@ export default function App() {
     (
       <div className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none">
         <div className="w-full max-w-xl p-10 md:p-16 pointer-events-auto bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl">
-          <h3 className="font-serif text-4xl md:text-6xl font-light mb-6 text-center text-white drop-shadow-2xl">The Estate</h3>
+          <h3 className="font-sans text-4xl md:text-6xl font-light mb-6 text-center text-white drop-shadow-2xl">The Estate</h3>
           <p className="font-sans text-xs md:text-sm tracking-[0.4em] text-zinc-300 mb-12 text-center uppercase drop-shadow-md">Listed by Luxury Agents</p>
           <form className="flex flex-col gap-8 font-sans text-sm md:text-base">
             <input type="text" placeholder="Name" className="bg-transparent border-b border-white/50 text-white pb-3 outline-none focus:border-white transition-colors placeholder:text-white/60 shadow-sm" />
@@ -406,7 +406,7 @@ export default function App() {
           isLoaded ? 'opacity-0 pointer-events-none scale-105 filter blur-md' : 'opacity-100 scale-100 filter blur-0'
         }`}
       >
-        <h2 className="text-white font-serif text-4xl md:text-7xl font-light tracking-widest mb-12 opacity-90 drop-shadow-2xl">The Estate</h2>
+        <h2 className="text-white font-sans text-4xl md:text-7xl font-light tracking-widest mb-12 opacity-90 drop-shadow-2xl">The Estate</h2>
         <div className="w-64 md:w-96 h-[1px] bg-white/10 relative overflow-hidden">
           <div 
             className="absolute top-0 left-0 h-full bg-white transition-all duration-300 ease-out"
