@@ -36,7 +36,7 @@ export default function PremiumHotspot({
   return (
     <div 
       className={`hotspot-${id} absolute z-[70] flex items-center justify-center w-0 h-0 ${className}`}
-      style={{ top, left, visibility: 'hidden', opacity: 0 }}
+      style={{ top, left, visibility: 'hidden' }}
     >
       {/* 1. Focus Ring */}
       <div className="ring absolute w-10 h-10 rounded-full border-[1px] border-white/30" style={{ transform: 'scale(0.2)', opacity: 0 }} />

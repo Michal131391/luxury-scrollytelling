@@ -103,7 +103,7 @@ function drawFrame(ctx, canvas, img) {
 }
 
 export default function App() {
-  const containerRef = useRef(null);
+  const scrollTrackRef = useRef(null);
   const mainWrapperRef = useRef(null);
   const dossierRef = useRef(null);
   const canvasRefs = useRef([]);
@@ -166,11 +166,11 @@ export default function App() {
 
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current,
+        trigger: scrollTrackRef.current,
         start: "top top",
-        end: `+=${totalScrollDuration * 100}%`,
+        end: "bottom bottom",
         scrub: 0,
-        pin: true,
+        pin: false, // NO PINNING - CSS sticky handles this smoothly
       }
     });
 
@@ -188,21 +188,22 @@ export default function App() {
       };
       
       const seg = segmentsConfig[i];
-      const segmentStart = segmentStarts[i];
-      const nextSegmentStart = segmentStarts[i + 1] || totalScrollDuration;
+      const segmentStart = segmentStarts[i] / totalScrollDuration;
+      const nextSegmentStart = (segmentStarts[i + 1] || totalScrollDuration) / totalScrollDuration;
 
-      const scrubStart = i === 0 ? 0 : segmentStart - 0.6; 
+      const scrubStart = i === 0 ? 0 : segmentStart - (0.6 / totalScrollDuration); 
       const scrubEnd = nextSegmentStart;
       const scrubDuration = scrubEnd - scrubStart;
 
       // 1. Scrub frames (with possible hotspot pause)
       if (seg.hotspotDuration > 0) {
+        const hotspotDurationRatio = seg.hotspotDuration / totalScrollDuration;
         const part1Ratio = seg.pauseFrame / maxFrame;
-        const baseScrubTime = scrubDuration - seg.hotspotDuration;
+        const baseScrubTime = scrubDuration - hotspotDurationRatio;
         const part1Duration = baseScrubTime * part1Ratio;
         
         const pauseStart = scrubStart + part1Duration;
-        const pauseEnd = pauseStart + seg.hotspotDuration;
+        const pauseEnd = pauseStart + hotspotDurationRatio;
         const part2Duration = baseScrubTime * (1 - part1Ratio);
 
         // Fly In
@@ -210,30 +211,23 @@ export default function App() {
         
         // Pause & Animate Hotspots
         const hotspots = `.hotspot-vid-${i}`;
-        const dimmer = `.dimmer-vid-${i}`;
         const animStart = pauseStart;
-        
-        // Dim background (Depth of Field effect)
-        tl.set(dimmer, { visibility: 'visible' }, animStart);
-        tl.to(dimmer, { autoAlpha: 1, duration: 0.5, ease: "power2.out" }, animStart);
         
         tl.set(hotspots, { visibility: 'visible' }, animStart);
         
         // Sequence: Ring -> Dot -> Line -> Card
-        tl.to(`${hotspots} .ring`, { scale: 1, autoAlpha: 1, duration: 0.6, ease: "expo.out", stagger: 0.1 }, animStart + 0.1);
-        tl.to(`${hotspots} .dot`, { autoAlpha: 1, duration: 0.3, stagger: 0.1 }, animStart + 0.3);
-        tl.to(`${hotspots} .line`, { scaleX: 1, scaleY: 1, duration: 0.6, ease: "power3.out", stagger: 0.1 }, animStart + 0.4);
-        tl.to(`${hotspots} .card`, { autoAlpha: 1, clipPath: 'inset(0 0% 0 0)', duration: 0.8, ease: "expo.out", stagger: 0.1 }, animStart + 0.6);
+        tl.to(`${hotspots} .ring`, { scale: 1, autoAlpha: 1, duration: (hotspotDurationRatio * 0.2), ease: "expo.out", stagger: (hotspotDurationRatio * 0.05) }, animStart + (hotspotDurationRatio * 0.05));
+        tl.to(`${hotspots} .dot`, { autoAlpha: 1, duration: (hotspotDurationRatio * 0.1), stagger: (hotspotDurationRatio * 0.05) }, animStart + (hotspotDurationRatio * 0.15));
+        tl.to(`${hotspots} .line`, { scaleX: 1, scaleY: 1, duration: (hotspotDurationRatio * 0.2), ease: "power3.out", stagger: (hotspotDurationRatio * 0.05) }, animStart + (hotspotDurationRatio * 0.2));
+        tl.to(`${hotspots} .card`, { autoAlpha: 1, clipPath: 'inset(0 0% 0 0)', duration: (hotspotDurationRatio * 0.3), ease: "expo.out", stagger: (hotspotDurationRatio * 0.05) }, animStart + (hotspotDurationRatio * 0.3));
         
         // Fade out everything before resuming
-        const fadeOutStart = pauseEnd - 0.5;
-        tl.to(dimmer, { autoAlpha: 0, duration: 0.4 }, fadeOutStart);
-        tl.to(hotspots, { autoAlpha: 0, duration: 0.4 }, fadeOutStart);
+        const fadeOutStart = pauseEnd - (hotspotDurationRatio * 0.2);
+        tl.to(hotspots, { autoAlpha: 0, duration: (hotspotDurationRatio * 0.15) }, fadeOutStart);
         
         tl.set(hotspots, { visibility: 'hidden' }, pauseEnd);
         tl.set(`${hotspots} .card`, { clipPath: 'inset(0 100% 0 0)' }, pauseEnd);
         tl.set(`${hotspots} .line`, { scaleX: 0, scaleY: 0 }, pauseEnd);
-        tl.set(dimmer, { visibility: 'hidden' }, pauseEnd);
 
         // Fly Out
         tl.to(proxy, { frame: maxFrame, duration: part2Duration, ease: "none", onUpdate: updateFrame }, pauseEnd);
@@ -242,48 +236,47 @@ export default function App() {
         tl.to(proxy, { frame: maxFrame, duration: scrubDuration, ease: "none", onUpdate: updateFrame }, scrubStart);
       }
 
-      // 2. Crossfade & Push Transition
+      // 2. Crossfade Transition (NO BLURS, NO SCALING)
       if (i < totalVideos - 1) {
         const nextCanvas = canvasRefs.current[i + 1];
-        const transitionStart = nextSegmentStart - 0.6; 
-        const transitionDuration = 0.6;
+        const transitionStart = nextSegmentStart - (0.6 / totalScrollDuration); 
+        const transitionDuration = (0.6 / totalScrollDuration);
         
         tl.to(canvas, { 
-          scale: 1.8, filter: "blur(20px)", opacity: 0, duration: transitionDuration, ease: "power2.inOut" 
+          opacity: 0, duration: transitionDuration, ease: "power2.inOut" 
         }, transitionStart);
-        
-        tl.fromTo(nextCanvas, 
-          { scale: 1 }, { scale: 1.05, duration: transitionDuration, ease: "none" }, transitionStart
-        );
       }
 
       // 3. Text Overlays (Staggered bridging)
       if (text) {
+        const textDuration = 0.8 / totalScrollDuration;
+        const textOutDuration = 0.5 / totalScrollDuration;
+
         if (i === 0) {
           tl.fromTo(text, 
-            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
-            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out" },
-            segmentStart + 0.2
+            { autoAlpha: 0, y: 40 },
+            { autoAlpha: 1, y: 0, duration: textDuration, ease: "power3.out" },
+            segmentStart + (0.2 / totalScrollDuration)
           );
           tl.to(text,
-            { autoAlpha: 0, y: -40, filter: "blur(15px)", duration: 0.5, ease: "power2.in" },
-            segmentStart + 0.8 
+            { autoAlpha: 0, y: -40, duration: textOutDuration, ease: "power2.in" },
+            segmentStart + (0.8 / totalScrollDuration) 
           );
         } else if (i === totalVideos - 1) {
           tl.fromTo(text, 
-            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
-            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" },
-            segmentStart + 0.6
+            { autoAlpha: 0, y: 40 },
+            { autoAlpha: 1, y: 0, duration: textDuration, ease: "power3.out" },
+            segmentStart + (0.6 / totalScrollDuration)
           );
         } else {
           tl.fromTo(text, 
-            { autoAlpha: 0, y: 40, filter: "blur(15px)" },
-            { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out" },
-            segmentStart - 0.7 
+            { autoAlpha: 0, y: 40 },
+            { autoAlpha: 1, y: 0, duration: textDuration, ease: "power3.out" },
+            segmentStart - (0.7 / totalScrollDuration) 
           );
           tl.to(text,
-            { autoAlpha: 0, y: -40, filter: "blur(15px)", duration: 0.6, ease: "power2.in" },
-            segmentStart + 0.6 
+            { autoAlpha: 0, y: -40, duration: textOutDuration, ease: "power2.in" },
+            segmentStart + (0.6 / totalScrollDuration) 
           );
         }
       }
@@ -292,7 +285,7 @@ export default function App() {
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
     };
-  }, { scope: containerRef, dependencies: [isLoaded] });
+  }, { scope: scrollTrackRef, dependencies: [isLoaded] });
 
   // Handle Dossier Animation
   useEffect(() => {
@@ -405,7 +398,7 @@ export default function App() {
   ];
 
   return (
-    <div className="bg-black w-full min-h-screen font-sans selection:bg-white/20 overflow-hidden">
+    <div className="bg-black w-full min-h-screen font-sans selection:bg-white/20">
       
       {/* Cinematic Preloader */}
       <div 
@@ -425,65 +418,69 @@ export default function App() {
         </p>
       </div>
 
-      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
-        {/* Main Wrapper for Scaling and Blurring when Dossier opens */}
-        <div ref={mainWrapperRef} className="absolute inset-0 origin-bottom will-change-transform">
-            {frameCounts.map((_, i) => (
-            <canvas
-                key={`canvas-${i}`}
-                ref={el => canvasRefs.current[i] = el}
-                className="absolute inset-0 w-full h-full block origin-center will-change-transform"
-            />
-            ))}
+      {/* Massive Scroll Track mapped to duration */}
+      <div ref={scrollTrackRef} style={{ height: `${totalScrollDuration * 100}vh` }} className="relative w-full bg-black">
+        
+        {/* Sticky Container - replaces pin:true for massive perf boost */}
+        <div className="sticky top-0 w-full h-screen overflow-hidden">
+            {/* Main Wrapper for Scaling and Blurring when Dossier opens */}
+            <div ref={mainWrapperRef} className="absolute inset-0 origin-bottom will-change-transform">
+                
+                {/* Canvases */}
+                {frameCounts.map((_, i) => (
+                <canvas
+                    key={`canvas-${i}`}
+                    ref={el => canvasRefs.current[i] = el}
+                    className="absolute inset-0 w-full h-full block origin-center will-change-transform opacity-100"
+                    style={{ willChange: 'transform, opacity' }}
+                />
+                ))}
 
-            {/* Global Dimmers for Depth of Field effect */}
-            {segmentsConfig.map((seg, i) => seg.hotspotDuration > 0 && (
-            <div key={`dimmer-${i}`} className={`dimmer-vid-${i} absolute inset-0 bg-black/20 z-[50] pointer-events-none`} style={{ opacity: 0, visibility: 'hidden' }} />
-            ))}
+                {/* --- HOTSPOTS --- */}
+                {/* Note: Explicitly separate layer overlaying canvases */}
+                <div className="absolute inset-0 z-[50] pointer-events-none" style={{ willChange: 'opacity' }}>
+                
+                {/* Video 1: Pool & Spa */}
+                <PremiumHotspot id="1-1" className="hotspot-vid-1" title="Infinity Edge" subtitle="Architectural Water Feature" spec1="Design" spec2="Seamless Horizon" top="65%" left="45%" direction="right" />
+                <PremiumHotspot id="1-2" className="hotspot-vid-1" title="Cascading Spa" subtitle="Custom Built" spec1="Capacity" spec2="12-Person" top="75%" left="75%" direction="top" />
 
-            {/* --- HOTSPOTS --- */}
-            <div className="absolute inset-0 z-[55] pointer-events-none">
-            
-            {/* Video 1: Pool & Spa */}
-            <PremiumHotspot id="1-1" className="hotspot-vid-1" title="Infinity Edge" subtitle="Architectural Water Feature" spec1="Design" spec2="Seamless Horizon" top="65%" left="45%" direction="right" />
-            <PremiumHotspot id="1-2" className="hotspot-vid-1" title="Cascading Spa" subtitle="Custom Built" spec1="Capacity" spec2="12-Person" top="75%" left="75%" direction="top" />
+                {/* Video 2: Entrance */}
+                <PremiumHotspot id="2-1" className="hotspot-vid-2" title="Crystal Chandelier" subtitle="Foyer Lighting" spec1="Origin" spec2="Imported Italian" top="20%" left="50%" direction="right" />
+                <PremiumHotspot id="2-2" className="hotspot-vid-2" title="Vaulted Ceilings" subtitle="Grand Scale" spec1="Height" spec2="24 Feet" top="15%" left="25%" direction="bottom" />
 
-            {/* Video 2: Entrance */}
-            <PremiumHotspot id="2-1" className="hotspot-vid-2" title="Crystal Chandelier" subtitle="Foyer Lighting" spec1="Origin" spec2="Imported Italian" top="20%" left="50%" direction="right" />
-            <PremiumHotspot id="2-2" className="hotspot-vid-2" title="Vaulted Ceilings" subtitle="Grand Scale" spec1="Height" spec2="24 Feet" top="15%" left="25%" direction="bottom" />
+                {/* Video 3: Living Room */}
+                <PremiumHotspot id="3-1" className="hotspot-vid-3" title="Artisan Fireplace" subtitle="Custom Stonework" spec1="Material" spec2="Italian Travertine" top="55%" left="15%" direction="right" />
+                <PremiumHotspot id="3-2" className="hotspot-vid-3" title="Hardwood Flooring" subtitle="Wide Plank" spec1="Wood Type" spec2="European Oak" top="75%" left="55%" direction="left" />
 
-            {/* Video 3: Living Room */}
-            <PremiumHotspot id="3-1" className="hotspot-vid-3" title="Artisan Fireplace" subtitle="Custom Stonework" spec1="Material" spec2="Italian Travertine" top="55%" left="15%" direction="right" />
-            <PremiumHotspot id="3-2" className="hotspot-vid-3" title="Hardwood Flooring" subtitle="Wide Plank" spec1="Wood Type" spec2="European Oak" top="75%" left="55%" direction="left" />
+                {/* Video 4: Kitchen */}
+                <PremiumHotspot id="4-1" className="hotspot-vid-4" title="Calacatta Gold" subtitle="Chef's Island" spec1="Finish" spec2="Honed Marble" top="65%" left="45%" direction="left" />
+                <PremiumHotspot id="4-2" className="hotspot-vid-4" title="Sub-Zero & Wolf" subtitle="Integrated Appliances" spec1="Series" spec2="Professional Grade" top="35%" left="70%" direction="bottom" />
 
-            {/* Video 4: Kitchen */}
-            <PremiumHotspot id="4-1" className="hotspot-vid-4" title="Calacatta Gold" subtitle="Chef's Island" spec1="Finish" spec2="Honed Marble" top="65%" left="45%" direction="left" />
-            <PremiumHotspot id="4-2" className="hotspot-vid-4" title="Sub-Zero & Wolf" subtitle="Integrated Appliances" spec1="Series" spec2="Professional Grade" top="35%" left="70%" direction="bottom" />
+                {/* Video 5: Entertainment */}
+                <PremiumHotspot id="5-1" className="hotspot-vid-5" title="Acoustic Paneling" subtitle="Theater Grade" spec1="Rating" spec2="Studio Quality" top="40%" left="20%" direction="right" />
+                <PremiumHotspot id="5-2" className="hotspot-vid-5" title="Bespoke Wet Bar" subtitle="Entertainment Lounge" spec1="Counter" spec2="Backlit Onyx" top="60%" left="80%" direction="left" />
 
-            {/* Video 5: Entertainment */}
-            <PremiumHotspot id="5-1" className="hotspot-vid-5" title="Acoustic Paneling" subtitle="Theater Grade" spec1="Rating" spec2="Studio Quality" top="40%" left="20%" direction="right" />
-            <PremiumHotspot id="5-2" className="hotspot-vid-5" title="Bespoke Wet Bar" subtitle="Entertainment Lounge" spec1="Counter" spec2="Backlit Onyx" top="60%" left="80%" direction="left" />
+                {/* Video 6: Master Suite */}
+                <PremiumHotspot id="6-1" className="hotspot-vid-6" title="Panoramic Windows" subtitle="Valley Views" spec1="Glass" spec2="Floor-to-Ceiling" top="30%" left="30%" direction="right" />
+                <PremiumHotspot id="6-2" className="hotspot-vid-6" title="Spa Soaking Tub" subtitle="Primary Bath" spec1="Placement" spec2="Freestanding" top="65%" left="70%" direction="top" />
 
-            {/* Video 6: Master Suite */}
-            <PremiumHotspot id="6-1" className="hotspot-vid-6" title="Panoramic Windows" subtitle="Valley Views" spec1="Glass" spec2="Floor-to-Ceiling" top="30%" left="30%" direction="right" />
-            <PremiumHotspot id="6-2" className="hotspot-vid-6" title="Spa Soaking Tub" subtitle="Primary Bath" spec1="Placement" spec2="Freestanding" top="65%" left="70%" direction="top" />
+                </div>
 
+                {/* Elegant Gradient for Typography */}
+                <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-40 pointer-events-none mix-blend-multiply" />
+
+                {/* Text Containers */}
+                {textOverlays.map((content, i) => (
+                <div
+                    key={i}
+                    ref={el => textRefs.current[i] = el}
+                    className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end will-change-transform"
+                    style={{ opacity: 0, visibility: 'hidden', willChange: 'transform, opacity' }}
+                >
+                    {content}
+                </div>
+                ))}
             </div>
-
-            {/* Elegant Gradient for Typography */}
-            <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-40 pointer-events-none mix-blend-multiply" />
-
-            {/* Text Containers */}
-            {textOverlays.map((content, i) => (
-            <div
-                key={i}
-                ref={el => textRefs.current[i] = el}
-                className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end will-change-transform"
-                style={{ opacity: 0, visibility: 'hidden' }}
-            >
-                {content}
-            </div>
-            ))}
         </div>
       </div>
       
