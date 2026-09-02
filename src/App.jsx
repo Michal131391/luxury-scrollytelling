@@ -158,18 +158,23 @@ export default function App() {
       const maxFrame = frames.length - 1;
       
       const segmentStart = i * 2;
-      const segmentDuration = 2;
+      
+      // Calculate exactly when this video becomes visible and when it disappears
+      // This ensures the video is playing *during* the crossfade, not static
+      const scrubStart = i === 0 ? 0 : segmentStart - 0.6; // Matches the previous transition start (segmentStart - 2 + 1.4)
+      const scrubEnd = segmentStart + 2.0; // The end of its own transition
+      const scrubDuration = scrubEnd - scrubStart;
 
-      // 1. Scrub frames
+      // 1. Scrub frames continuously for the entire duration it is visible
       tl.to(proxy, {
         frame: maxFrame,
-        duration: segmentDuration,
+        duration: scrubDuration,
         ease: "none",
         onUpdate: () => {
           const fIndex = Math.round(proxy.frame);
           drawFrame(ctx, canvas, frames[fIndex]);
         }
-      }, segmentStart);
+      }, scrubStart);
 
       // 2. Crossfade & Push Transition (Apple-style)
       if (i < totalVideos - 1) {
